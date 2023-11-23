@@ -4,6 +4,7 @@ import com.appware_system.books.model.entity.BookEntity;
 import com.appware_system.books.model.enums.BooksLanguage;
 import com.appware_system.books.model.enums.Categories;
 import lombok.*;
+import org.springframework.lang.NonNull;
 
 import java.sql.Date;
 
@@ -11,6 +12,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
+
 
     private String authorName;
 

@@ -5,6 +5,7 @@ import com.appware_system.books.model.entity.BookEntity;
 import com.appware_system.books.model.enums.Categories;
 import com.appware_system.books.validations.ValidationForBook;
 import com.appware_system.books.service.BooksService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,17 +14,12 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/books")
-public class BooksController {
+@RequestMapping("/api/v1/admin")
+@RequiredArgsConstructor
+public class AdminController {
 
 
     private final BooksService booksService;
-
-
-    @Autowired
-    public BooksController(BooksService booksService) {
-        this.booksService = booksService;
-    }
 
 
     @GetMapping("/get/{booksId}")

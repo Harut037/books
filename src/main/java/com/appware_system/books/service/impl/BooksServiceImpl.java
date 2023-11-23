@@ -1,10 +1,11 @@
-package com.appware_system.books.service;
+package com.appware_system.books.service.impl;
 
 import com.appware_system.books.model.domain.Book;
 import com.appware_system.books.model.entity.BookEntity;
 import com.appware_system.books.model.enums.BooksLanguage;
 import com.appware_system.books.model.enums.Categories;
 import com.appware_system.books.repository.BooksRepository;
+import com.appware_system.books.service.BooksService;
 import com.appware_system.books.validations.ValidationForBook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
