@@ -31,6 +31,7 @@ public class Book {
     private double rating;
 
 
+
     public Book(BookEntity bookEntity) {
         this.authorName = bookEntity.getAuthorName();
         this.authorSurname = bookEntity.getAuthorSurname();

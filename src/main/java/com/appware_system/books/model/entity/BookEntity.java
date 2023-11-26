@@ -7,14 +7,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "books")
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class BookEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,6 +44,11 @@ public class BookEntity {
 
     @Column(name = "rating", nullable = false)
     private double rating;
+
+    @OneToOne
+    @JoinColumn(name = "review_id")
+    private ReviewEntity reviews;
+
 
     public BookEntity(Book book) {
         this.authorName = book.getAuthorName();

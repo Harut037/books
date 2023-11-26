@@ -14,10 +14,9 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/v1/admin")
+@RequestMapping("/Admin")
 @RequiredArgsConstructor
 public class AdminController {
-
 
     private final BooksService booksService;
 
@@ -33,7 +32,7 @@ public class AdminController {
         return booksService.getAll();
     }
 
-    @PostMapping("/add")
+    @PostMapping("/addBook")
     public String add(@RequestBody Book book) {
         ValidationForBook vfb = new ValidationForBook();
         if (vfb.isValidBook(book)) {

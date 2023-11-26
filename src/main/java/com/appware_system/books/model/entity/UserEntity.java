@@ -1,72 +1,53 @@
 package com.appware_system.books.model.entity;
 
 
-import com.appware_system.books.model.enums.Role;
+import com.appware_system.books.model.domain.SignUpUser;
+import com.appware_system.books.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalDate;
 
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements UserDetails {
+public class UserEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "mail", nullable = false)
+    @Column(name = "email", nullable = false, length = 50, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password",nullable = false)
     private String password;
+    @OneToOne
+    @JoinColumn(name = "role_id")
+    private RoleEntity roleEntity;
 
-    @Column(name = "role", nullable = false)
-    private Role role;
 
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+    public UserEntity(SignUpUser signUpUser) {
+        this.setFirstName(signUpUser.getFirstName());
+        this.setLastName(signUpUser.getLastName());
+        this.setEmail(signUpUser.getEmail());
+        this.setPassword(signUpUser.getPassword());
+        this.setStatus(Status.ACTIVE);
+        this.setCreated(LocalDate.now());
     }
 
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public void setPassword(String password) {
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 }

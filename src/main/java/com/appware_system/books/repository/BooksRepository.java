@@ -22,12 +22,14 @@ public interface BooksRepository extends JpaRepository<BookEntity, Long> {
     @Query("SELECT a FROM BookEntity a ORDER BY a.rating DESC")
     List<BookEntity> findAllBooksOrderedByRatingDesc();
 
-
+    @Query("SELECT a FROM BookEntity a ORDER BY a.category ASC")
     List<BookEntity> findBookEntitiesByCategory(Categories category);
 
+    @Query("SELECT a FROM BookEntity  a ORDER BY a.authorSurname")
     List<BookEntity> findBookEntitiesByAuthorName(String authorName);
 
-    List<BookEntity> findBookEntitiesByAuthorSurname(String surName);
+    @Query("SELECT a FROM BookEntity  a order by a.authorSurname")
+    List<BookEntity> findBookEntitiesByAuthorSurname(String authorSurname);
 
     @Transactional
     @Modifying
@@ -66,6 +68,11 @@ public interface BooksRepository extends JpaRepository<BookEntity, Long> {
     @Modifying
     @Query("UPDATE BookEntity t SET t.year = :year where t.id = :id")
     void updateYear(Date year, Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE BookEntity t SET t.reviews = :review where t.id = :id")
+    void updateReview(String review, Long id);
 
 }
 

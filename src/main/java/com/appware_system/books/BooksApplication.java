@@ -11,27 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class BooksApplication implements CommandLineRunner {
+public class BooksApplication {
 
-	private final UserRepository userRepository;
+    public static void main(String[] args) {
+        SpringApplication.run(BooksApplication.class, args);
+    }
 
-
-
-	public static void main(String[] args) {
-		SpringApplication.run(BooksApplication.class, args);
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		UserEntity adminAccount = userRepository.findByRole(Role.ADMIN);
-		if (adminAccount == null){
-			UserEntity userEntity = new UserEntity();
-			userEntity.setEmail("admin@gmail.com");
-			userEntity.setFirstName("admin");
-			userEntity.setLastName("admin");
-			userEntity.setRole(Role.ADMIN);
-			userEntity.setPassword(new BCryptPasswordEncoder().encode("admin"));
-			userRepository.save(userEntity);
-		}
-	}
 }
+
