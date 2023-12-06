@@ -4,21 +4,14 @@ package com.appware_system.books.service.impl;
 import com.appware_system.books.model.domain.EditInfo;
 import com.appware_system.books.model.domain.SignUpUser;
 import com.appware_system.books.model.domain.User;
-import com.appware_system.books.model.entity.BookEntity;
 import com.appware_system.books.model.entity.RoleEntity;
 import com.appware_system.books.model.entity.UserEntity;
-import com.appware_system.books.repository.BooksRepository;
 import com.appware_system.books.repository.UserRepository;
 import com.appware_system.books.service.RoleService;
 import com.appware_system.books.service.UserService;
-import com.appware_system.books.validations.ValidationForBook;
-import com.appware_system.books.validations.ValidationForUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -30,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtServiceImpl jwtService;
     private final RoleService roleService;
-    private final BooksRepository booksRepository;
+
 
 
     /**
@@ -215,14 +208,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public String leaveReview(Long id, String review) {
-        Optional<BookEntity> bookEntity = booksRepository.findById(id);
-        if (bookEntity.isPresent() && review != null){
-            booksRepository.updateReview(review,id);
-            return "Update has ben done successfully";
-        }
-        throw new IllegalArgumentException("Book does not find or review is null");
-    }
+
+
+
 }
 

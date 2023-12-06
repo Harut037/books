@@ -10,12 +10,19 @@ import lombok.*;
 @RequiredArgsConstructor
 public class ReviewEntity  {
 
-    @Column(name = "book_id")
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "review", length = 50)
-    private String review;
+    private String reviewText;
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private BookEntity book;
 
 
+    public ReviewEntity(String reviewText, BookEntity book) {
+        this.reviewText = reviewText;
+        this.book = book;
+    }
 }

@@ -3,6 +3,7 @@ package com.appware_system.books.service;
 
 import com.appware_system.books.model.domain.Book;
 import com.appware_system.books.model.entity.BookEntity;
+import com.appware_system.books.model.entity.ReviewEntity;
 import com.appware_system.books.model.enums.Categories;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,11 @@ public interface BooksService {
 
     List<BookEntity> getByCategory(Categories category);
 
+    String addRating(Long id, double rating);
 
     String updateBook(Long id, Book book);
+
+    void addReview(ReviewEntity review);
 
 
 }

@@ -13,7 +13,6 @@ import java.sql.Date;
 @NoArgsConstructor
 public class Book {
 
-
     private String authorName;
 
     private String authorSurname;
@@ -30,8 +29,6 @@ public class Book {
 
     private double rating;
 
-
-
     public Book(BookEntity bookEntity) {
         this.authorName = bookEntity.getAuthorName();
         this.authorSurname = bookEntity.getAuthorSurname();
@@ -42,6 +39,8 @@ public class Book {
         this.price = Integer.valueOf(bookEntity.getPrice());
         this.rating = bookEntity.getRating();
     }
+
+
 
     public void setRating(double rating) {
         if (rating < 5 && rating > 0) {

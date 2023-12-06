@@ -2,11 +2,14 @@ package com.appware_system.books.service.impl;
 
 import com.appware_system.books.model.domain.Book;
 import com.appware_system.books.model.entity.BookEntity;
+import com.appware_system.books.model.entity.ReviewEntity;
 import com.appware_system.books.model.enums.BooksLanguage;
 import com.appware_system.books.model.enums.Categories;
 import com.appware_system.books.repository.BooksRepository;
+import com.appware_system.books.repository.ReviewRepository;
 import com.appware_system.books.service.BooksService;
 import com.appware_system.books.validations.ValidationForBook;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +20,13 @@ import java.util.Optional;
 public class BooksServiceImpl implements BooksService {
 
     private final BooksRepository booksRepository;
+    private final ReviewRepository reviewRepository;
 
 
     @Autowired
-    public BooksServiceImpl(BooksRepository booksRepository) {
+    public BooksServiceImpl(BooksRepository booksRepository, ReviewRepository reviewRepository) {
         this.booksRepository = booksRepository;
+        this.reviewRepository = reviewRepository;
     }
 
 
@@ -74,32 +79,58 @@ public class BooksServiceImpl implements BooksService {
     }
 
     @Override
+    public String addRating(Long id, double rating) {
+        if (rating <= 0 || rating >= 5) {
+            throw new IllegalArgumentException("Rating should be between 1 and 5");
+        }
+        Optional<BookEntity> bookEntity = booksRepository.findById(id);
+        if (bookEntity.isPresent()) {
+            double result;
+            if (bookEntity.get().getRating() == 0) {
+                result = rating;
+            } else {
+                result = (bookEntity.get().getRating() + rating) / 2;
+            }
+            booksRepository.addRating(id, result);
+        }
+        return null;
+    }
+
+    @Override
     public String updateBook(Long id, Book book) {
         ValidationForBook vfb = new ValidationForBook();
         Optional<BookEntity> bookEntity = booksRepository.findById(id);
         if (bookEntity.isPresent()) {
             if (vfb.isValidAuthorName(book.getAuthorName()) != null) {
-                booksRepository.updateAuthorName(book.getAuthorName(), bookEntity.get().getId());
+                booksRepository.updateAuthorName(book.getAuthorName(), id);
             }
             if (vfb.isValidAuthorSurname(book.getAuthorSurname()) != null) {
-                booksRepository.updateAuthorSurname(book.getAuthorSurname(), bookEntity.get().getId());
+                booksRepository.updateAuthorSurname(book.getAuthorSurname(), id);
             }
-            if (vfb.isValidateDate(book.getYear()) != null) {
+            if (book.getYear() != null && vfb.isValidateDate(book.getYear()) != null) {
                 booksRepository.updateYear(book.getYear(), id);
             }
             if (book.getPrice() != 0.0) {
                 booksRepository.updatePrice(book.getPrice(), id);
             }
-            if (book.getRating() != 0.0) {
-                booksRepository.updateRating(book.getRating(), id);
+            if (book.getCategory() != null) {
+                Categories categories = book.getCategory();
+                booksRepository.updateCategory(categories, id);
             }
-           if (book.getCategory() != null) {
-////                bookEntity.get().setCategory(Categories.valueOf(book.getCategory().toString()));
-//                if (book.getOriginalLanguage() != null) {
-//                    bookEntity.get().setOriginalLanguage(BooksLanguage.valueOf(book.getOriginalLanguage().toString()));
-//                }
+            if (book.getOriginalLanguage() != null) {
+                BooksLanguage booksLanguage = book.getOriginalLanguage();
+                booksRepository.updateLanguage(booksLanguage, id);
             }
         }
         return "The book has updated successfully";
+    }
+
+    @Override
+    public void addReview(ReviewEntity review) {
+        Optional<BookEntity> bookEntity = booksRepository.findById(review.getBook().getId());
+        if (bookEntity.isPresent() && review.getReviewText() != null) {
+            reviewRepository.save(review);
+//            booksRepository.updateReview(review, review.getId());
+        }
     }
 }

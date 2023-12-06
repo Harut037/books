@@ -1,20 +1,23 @@
 package com.appware_system.books.controller;
 
-import com.appware_system.books.model.domain.EditInfo;
-import com.appware_system.books.model.domain.PasswordChange;
-import com.appware_system.books.model.domain.User;
+import com.appware_system.books.model.domain.*;
 import com.appware_system.books.model.entity.BookEntity;
+import com.appware_system.books.model.entity.ReviewEntity;
 import com.appware_system.books.model.enums.Categories;
 import com.appware_system.books.service.BooksService;
 import com.appware_system.books.service.UserService;
 import com.appware_system.books.service.impl.JwtServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -28,7 +31,7 @@ public class UserController {
     @Autowired
     public UserController(UserService userService, BooksService booksService, JwtServiceImpl jwtService) {
         this.userService = userService;
-        this.booksService= booksService;
+        this.booksService = booksService;
         this.jwtService = jwtService;
     }
 
@@ -101,9 +104,19 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
-    public List<BookEntity> get() {
-        return booksService.getAll();
+    public ResponseEntity<List<BookEntity>> getAll() {
+        try {
+            List<BookEntity> books = booksService.getAll();
+
+            if (books.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            }
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
     }
+
 
     @GetMapping("/get/{booksId}")
     public Optional<BookEntity> get(@PathVariable("booksId") Long booksId) {
@@ -131,18 +144,39 @@ public class UserController {
     }
 
     @GetMapping("/getByCategory/{category}")
-    public List<BookEntity> getByCategories(@PathVariable("category") Categories category) {
-        return booksService.getByCategory(category);
+    public ResponseEntity<List<BookEntity>> getByCategories(@PathVariable("category") Categories category) {
+        try {
+            List<BookEntity> books = booksService.getByCategory(category);
+            if (books.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            }
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
     }
 
-    @PutMapping("/leaveReview")
-    public String leaveReview(@RequestHeader(value = "Authorization") String authorizationToken,
-                                 @Valid @RequestBody @NonNull PasswordChange passwordChange) {
-        String email = jwtService.extractUsername(authorizationToken.substring(7));
-        if (email == null) {
-            throw new UsernameNotFoundException("No Such User");
-        } else {
-            return userService.resetChange(email, passwordChange.getNewPassword());
+
+    @PostMapping("/addReview")
+    public ResponseEntity<String> addReview(@RequestBody ReviewEntity review) {
+        try {
+            booksService.addReview(review);
+            return ResponseEntity.ok("Review added successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding review");
+        }
+    }
+
+
+    @PutMapping("/addRating/{id}/{rating}")
+    public ResponseEntity<String> addRating(@PathVariable("id") Long id, @PathVariable("rating") double rating) {
+        try {
+            booksService.addRating(id, rating);
+            return ResponseEntity.ok("Rating added successfully");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid rating");
         }
     }
 

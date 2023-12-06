@@ -71,8 +71,8 @@ public class AdminController {
         return booksService.getByCategory(category);
     }
 
-    @PutMapping("update/{booksId}")
-    public String update(@PathVariable("booksId") Long id, @RequestBody Book book) {
+    @PutMapping("update/{id}")
+    public String update(@PathVariable("id") Long id, @RequestBody Book book) {
         return booksService.updateBook(id, book);
     }
 }

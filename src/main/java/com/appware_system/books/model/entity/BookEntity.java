@@ -9,6 +9,7 @@ import lombok.*;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Table(name = "books")
 @Entity
@@ -45,9 +46,8 @@ public class BookEntity {
     @Column(name = "rating", nullable = false)
     private double rating;
 
-    @OneToOne
-    @JoinColumn(name = "review_id")
-    private ReviewEntity reviews;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<ReviewEntity> reviews = new ArrayList<>();
 
 
     public BookEntity(Book book) {

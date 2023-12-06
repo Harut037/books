@@ -30,5 +30,5 @@ public interface UserService {
 
     UserEntity getUser (String email);
 
-    String leaveReview(Long id, String review);
+
 }
