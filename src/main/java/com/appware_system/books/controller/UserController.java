@@ -168,6 +168,7 @@ public class UserController {
     }
 
 
+    
     @PutMapping("/addRating/{id}/{rating}")
     public ResponseEntity<String> addRating(@PathVariable("id") Long id, @PathVariable("rating") double rating) {
         try {
