@@ -5,8 +5,11 @@ import com.appware_system.books.model.entity.BookEntity;
 import com.appware_system.books.model.enums.Categories;
 import com.appware_system.books.validations.ValidationForBook;
 import com.appware_system.books.service.BooksService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,58 +24,86 @@ public class AdminController {
     private final BooksService booksService;
 
 
-    @GetMapping("/get/{booksId}")
-    public Optional<BookEntity> get(@PathVariable("booksId") Long booksId) {
-        return booksService.get(booksId);
+    @GetMapping("/{booksId}")
+    public ResponseEntity<BookEntity> getBookById(@PathVariable("booksId") Long booksId) {
+        Optional<BookEntity> book = booksService.get(booksId);
+        return book.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
-    @GetMapping("/getAll")
-    public List<BookEntity> get() {
-        return booksService.getAll();
+    @GetMapping("/books")
+    public ResponseEntity<List<BookEntity>> getAllBooks() {
+        List<BookEntity> allBooks = booksService.getAll();
+        if (allBooks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(allBooks);
     }
+
 
     @PostMapping("/addBook")
-    public String add(@RequestBody Book book) {
-        ValidationForBook vfb = new ValidationForBook();
-        if (vfb.isValidBook(book)) {
-            return booksService.add(book);
+    public ResponseEntity<String> addBook(@Valid @RequestBody Book book) {
+        if (booksService.add(book) != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Book added successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid book");
         }
-        return "Invalid book";
+    }
+    @DeleteMapping("/{booksId}")
+    public ResponseEntity<String> deleteBook(@PathVariable("booksId") Long id) {
+        String result = booksService.delete(id);
+        return result != null ?
+                ResponseEntity.ok(result) :
+                ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/delete/{booksId}")
-    public String delete(@PathVariable("booksId") Long id) {
-        return booksService.delete(id);
+    @GetMapping("/books/sortByCost")
+    public ResponseEntity<List<BookEntity>> sortByCost() {
+        List<BookEntity> sortedBooks = booksService.sortByPrice();
+        return ResponseEntity.ok(sortedBooks);
     }
 
-    @GetMapping("/get/sortByCost")
-    public List<BookEntity> sortByPrice() {
-        return booksService.sortByPrice();
+    @GetMapping("/books/sortByRating")
+    public ResponseEntity<List<BookEntity>> sortByRating() {
+        List<BookEntity> sortedBooks = booksService.sortByRating();
+        return ResponseEntity.ok(sortedBooks);
     }
 
-    @GetMapping("/get/sortByRating")
-    public List<BookEntity> sortByRating() {
-        return booksService.sortByRating();
+    @GetMapping("/books/author/{authorName}")
+    public ResponseEntity<List<BookEntity>> getByAuthorName(@PathVariable("authorName") String authorName) {
+        List<BookEntity> booksByAuthor = booksService.getByAuthorName(authorName);
+        if (booksByAuthor.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(booksByAuthor);
     }
 
-    @GetMapping("/getByName/{authorName}")
-    public List<BookEntity> getByAuthorName(@PathVariable("authorName") String authorName) {
-        return booksService.getByAuthorName(authorName);
+    @GetMapping("/books/author/surname/{authorSurname}")
+    public ResponseEntity<List<BookEntity>> getByAuthorSurname(@PathVariable("authorSurname") String authorSurname) {
+        List<BookEntity> booksByAuthorSurname = booksService.getByAuthorSurname(authorSurname);
+        if (booksByAuthorSurname.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(booksByAuthorSurname);
     }
 
-    @GetMapping("/getBySurname/{authorSurname}")
-    public List<BookEntity> getByAuthorSurname(@PathVariable("authorSurname") String authorSurname) {
-        return booksService.getByAuthorSurname(authorSurname);
+    @GetMapping("/books/category/{category}")
+    public ResponseEntity<List<BookEntity>> getByCategory(@PathVariable("category") Categories category) {
+        List<BookEntity> booksByCategory = booksService.getByCategory(category);
+        if (booksByCategory.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(booksByCategory);
     }
 
-    @GetMapping("/getByCategory/{category}")
-    public List<BookEntity> getByCategories(@PathVariable("category") Categories category) {
-        return booksService.getByCategory(category);
-    }
-
-    @PutMapping("update/{id}")
-    public String update(@PathVariable("id") Long id, @RequestBody Book book) {
-        return booksService.updateBook(id, book);
+    @PutMapping("/books/{id}")
+    public ResponseEntity<String> updateBook(@PathVariable("id") Long id, @RequestBody Book book) {
+        String result = booksService.updateBook(id, book);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book with ID " + id + " not found");
+        }
     }
 }
